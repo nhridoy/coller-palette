@@ -4,6 +4,10 @@
 ```commandline
 git clone https://github.com/nhridoy/color-palette.git
 ```
+### Navigate
+```commandline
+cd color-palette
+```
 ### Create Virtual Environment
 ```commandline
 py -m venv venv

@@ -1,0 +1,186 @@
+{% extends "base.html" %}
+{% block css %}
+
+{% endblock %}
+{% block body %}
+    {% include "navbar.html" %}
+    <div class="container">
+        <div class="row mt-5 row-cols-2">
+            <div class="col">
+                <div class="">Create Color Palette</div>
+            </div>
+            <div class="row">
+                <!-- Button trigger modal -->
+                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
+                    Create
+                </button>
+                <!-- Modal -->
+                <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel"
+                     aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                        aria-label="Close"></button>
+                            </div>
+                            <form method="post">
+                                {% csrf_token %}
+                                <div class="modal-body">
+                                    <div class="mb-3">
+                                        <label for="palette_name" class="form-label fw-bold">Palette Name</label>
+                                        <input type="text" class="form-control" id="palette_name" name="palette_name"
+                                               required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="primary_one" class="form-label fw-bold">Primary Color One</label>
+                                        <input type="color" name="primary_one" class="form-control" id="primary_one"
+                                               required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="primary_two" class="form-label fw-bold">Primary Color Two</label>
+                                        <input type="color" name="primary_two" class="form-control" id="primary_two"
+                                               required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="secondary_one" class="form-label fw-bold">Secondary Color
+                                            One</label>
+                                        <input type="color" name="secondary_one" class="form-control" id="secondary_one"
+                                               required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="secondary_two" class="form-label fw-bold">Secondary Color
+                                            Two</label>
+                                        <input type="color" name="secondary_two" class="form-control" id="secondary_two"
+                                               required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="secondary_three" class="form-label fw-bold">Secondary Color
+                                            Three</label>
+                                        <input type="color" name="secondary_three" class="form-control"
+                                               id="secondary_three" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="secondary_four" class="form-label fw-bold">Secondary Color
+                                            Four</label>
+                                        <input type="color" name="secondary_four" class="form-control"
+                                               id="secondary_four" required>
+                                    </div>
+                                    <div class="form-check">
+                                        <input name="public" class="form-check-input" type="checkbox"
+                                               id="public">
+                                        <label class="form-check-label" for="public">
+                                            Make Public
+                                        </label>
+                                    </div>
+
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close
+                                    </button>
+                                    <button type="submit" id="submit-btn" class="btn btn-primary">Save changes</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        <div class="row row-cols-sm-1 row-cols-md-2 row-cols-lg-3 row-cols-xl-4 mt-5" id="palettes">
+
+        </div>
+    </div>
+
+{% endblock %}
+{% block js %}
+    <script>
+        let csrf_token = $('[name="csrfmiddlewaretoken"]').attr('value');
+        let palettes = document.getElementById('palettes')
+        document.getElementById('submit-btn').addEventListener('click', (e) => {
+            e.preventDefault();
+            let data = {
+                "palette_name": document.getElementById('palette_name').value,
+                "primary_one": document.getElementById('primary_one').value,
+                "primary_two": document.getElementById('primary_two').value,
+                "secondary_one": document.getElementById('secondary_one').value,
+                "secondary_two": document.getElementById('secondary_two').value,
+                "secondary_three": document.getElementById('secondary_three').value,
+                "secondary_four": document.getElementById('secondary_four').value,
+                "public": document.getElementById('public').checked
+            }
+            fetch('http://127.0.0.1:8000/create-palette/', {
+                method: 'post',
+                body: JSON.stringify(data),
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    "X-CSRFToken": csrf_token
+                },
+            }).then(res => res.json())
+                .then(res => {
+                    console.log(res)
+                    document.getElementById('palette_name').value = ''
+                    document.getElementById('primary_one').value = ''
+                    document.getElementById('primary_two').value = ''
+                    document.getElementById('secondary_one').value = ''
+                    document.getElementById('secondary_two').value = ''
+                    document.getElementById('secondary_three').value = ''
+                    document.getElementById('secondary_four').value = ''
+                    document.getElementById('public').checked = ''
+                    Toastify({
+                        text: "Palette Added",
+                        duration: 3000
+                    }).showToast();
+                });
+            loadPalette();
+        })
+
+        let loadPalette = () => {
+            palettes.innerHTML = ``
+            fetch('http://127.0.0.1:8000/create-palette/', {
+                method: 'get',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+            }).then(res => res.json())
+                .then(res => {
+                    if (res.length > 0) {
+
+                        for (const item of res) {
+                            console.log(item)
+                            palettes.innerHTML += `<div class="col">
+                <div class="card" style="width: 18rem;">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center justify-content-center text-white"
+                             style="height: 45px; width: 100%; background: ${item.primary_one}"><p class="mb-0">${item.primary_one}</p></div>
+                        <div class="d-flex align-items-center justify-content-center text-white"
+                             style="height: 45px; width: 100%; background: ${item.primary_two}"><p class="mb-0">${item.primary_two}</p></div>
+<div class="d-flex align-items-center justify-content-center text-white"
+                             style="height: 45px; width: 100%; background: ${item.secondary_one}"><p class="mb-0">${item.secondary_one}</p></div>
+                        <div class="d-flex align-items-center justify-content-center text-white"
+                             style="height: 45px; width: 100%; background: ${item.secondary_two}"><p class="mb-0">${item.secondary_two}</p></div>
+<div class="d-flex align-items-center justify-content-center text-white"
+                             style="height: 45px; width: 100%; background: ${item.secondary_three}"><p class="mb-0">${item.secondary_three}</p></div>
+                        <div class="d-flex align-items-center justify-content-center text-white"
+                             style="height: 45px; width: 100%; background: ${item.secondary_four}"><p class="mb-0">${item.secondary_four}</p></div>
+                    </div>
+                    <div class="card-footer d-flex align-items-center justify-content-between">
+                        <p class="palette-name mb-0 fw-bold">${item.palette_name}</p>
+                        <a href="{% url 'color_app:favourite' %}${item.id}" class="" data-bs-toggle="tooltip" data-bs-placement="top"
+                           title="Save to Favourite"><i class="bi bi-bookmark-plus"></i></a>
+                    </div>
+                </div>
+            </div>`
+                        }
+                    } else {
+                        palettes.innerHTML += `<div class='text-center fw-bold'>No Palette Found</div>`
+                    }
+                });
+        }
+        loadPalette();
+
+    </script>
+
+{% endblock %}

@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% block css %}
+
+{% endblock %}
+{% block body %}
+    {% include "navbar.html" %}
+    <div class="container">
+        <div class="row row-cols-sm-1 row-cols-md-2 row-cols-lg-3 row-cols-xl-4 mt-5" id="palettes">
+            {% if saved_palettes.count > 0 %}
+                {% for saved_palette in saved_palettes %}
+                    <div class="col">
+                        <div class="card" style="width: 18rem;">
+                            <div class="card-body">
+                                <div class="d-flex align-items-center justify-content-center text-white"
+                                     style="height: 45px; width: 100%; background: {{ saved_palette.palette.primary_one }}">
+                                    <p class="mb-0">
+                                        {{ saved_palette.palette.primary_one }}</p></div>
+                                <div class="d-flex align-items-center justify-content-center text-white"
+                                     style="height: 45px; width: 100%; background: {{ saved_palette.palette.primary_two }}">
+                                    <p class="mb-0">
+                                        {{ saved_palette.palette.primary_two }}</p></div>
+                                <div class="d-flex align-items-center justify-content-center text-white"
+                                     style="height: 45px; width: 100%; background: {{ saved_palette.palette.secondary_one }}">
+                                    <p class="mb-0">
+                                        {{ saved_palette.palette.secondary_one }}</p></div>
+                                <div class="d-flex align-items-center justify-content-center text-white"
+                                     style="height: 45px; width: 100%; background: {{ saved_palette.palette.secondary_two }}">
+                                    <p class="mb-0">
+                                        {{ saved_palette.palette.secondary_two }}</p></div>
+                                <div class="d-flex align-items-center justify-content-center text-white"
+                                     style="height: 45px; width: 100%; background: {{ saved_palette.palette.secondary_three }}">
+                                    <p class="mb-0">
+                                        {{ saved_palette.palette.secondary_three }}</p></div>
+                                <div class="d-flex align-items-center justify-content-center text-white"
+                                     style="height: 45px; width: 100%; background: {{ saved_palette.palette.secondary_four }}">
+                                    <p class="mb-0">
+                                        {{ saved_palette.palette.secondary_four }}</p></div>
+                            </div>
+                            <div class="card-footer d-flex align-items-center justify-content-between">
+                                <p class="palette-name mb-0 fw-bold">{{ saved_palette.palette.palette_name }}</p>
+                                <a href="{% url 'color_app:favourite' id=saved_palette.palette.id %}" class=""
+                                   data-bs-toggle="tooltip"
+                                   data-bs-placement="top"
+                                   title="Remove Favourite"><i class="bi bi-bookmark-dash"></i></a>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <div class="text-center fw-bold">No Palette Found</div>
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}
+{% block js %}
+
+{% endblock %}

@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+{% block css %}
+
+{% endblock %}
+{% block body %}
+    {% include "navbar.html" %}
+    <div class="container">
+        <div class="row mt-5">
+            <form class="d-flex">
+                <input id="search" class="form-control me-2" type="search"
+                       placeholder="Search by Palette Name or Color Code"
+                       aria-label="Search">
+            </form>
+        </div>
+        <div class="row row-cols-sm-1 row-cols-md-2 row-cols-lg-3 row-cols-xl-4 mt-5" id="palettes">
+
+        </div>
+    </div>
+
+{% endblock %}
+{% block js %}
+
+    <script>
+        let searchField = document.getElementById('search');
+        searchField.addEventListener('keyup', (e) => {
+            loadPalette(e.target.value);
+        })
+
+        let loadPalette = (keyword) => {
+            palettes.innerHTML = ``
+            fetch(`http://127.0.0.1:8000/search-palette/?search=${keyword}`, {
+                method: 'get',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+            }).then(res => res.json())
+                .then(res => {
+                    if (res.length > 0) {
+
+                        for (const item of res) {
+                            console.log(item)
+                            palettes.innerHTML += `<div class="col">
+                <div class="card" style="width: 18rem;">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center justify-content-center text-white"
+                             style="height: 45px; width: 100%; background: ${item.primary_one}"><p class="mb-0">${item.primary_one}</p></div>
+                        <div class="d-flex align-items-center justify-content-center text-white"
+                             style="height: 45px; width: 100%; background: ${item.primary_two}"><p class="mb-0">${item.primary_two}</p></div>
+<div class="d-flex align-items-center justify-content-center text-white"
+                             style="height: 45px; width: 100%; background: ${item.secondary_one}"><p class="mb-0">${item.secondary_one}</p></div>
+                        <div class="d-flex align-items-center justify-content-center text-white"
+                             style="height: 45px; width: 100%; background: ${item.secondary_two}"><p class="mb-0">${item.secondary_two}</p></div>
+<div class="d-flex align-items-center justify-content-center text-white"
+                             style="height: 45px; width: 100%; background: ${item.secondary_three}"><p class="mb-0">${item.secondary_three}</p></div>
+                        <div class="d-flex align-items-center justify-content-center text-white"
+                             style="height: 45px; width: 100%; background: ${item.secondary_four}"><p class="mb-0">${item.secondary_four}</p></div>
+                    </div>
+                    <div class="card-footer d-flex align-items-center justify-content-between">
+                        <p class="palette-name mb-0 fw-bold">${item.palette_name}</p>
+                        <a href="{% url 'color_app:favourite' %}${item.id}" class="" data-bs-toggle="tooltip" data-bs-placement="top"
+                           title="Save to Favourite"><i class="bi bi-bookmark-plus"></i></a>
+                    </div>
+                </div>
+            </div>`
+                        }
+                    } else {
+                        palettes.innerHTML += `<div class='text-center fw-bold'>No Palette Found</div>`
+                    }
+                });
+        }
+        loadPalette('');
+    </script>
+
+{% endblock %}
